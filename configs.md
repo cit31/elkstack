@@ -111,3 +111,32 @@ output {
 
 # systemctl restart logstash
 ```
+
+
+---------------------------------------------------------------------------------------------------------------------
+# Case3
+---------------------------------------------------------------------------------------------------------------------
+
+We are going to push `/var/log/messages` and `/home/studentapp/apache-tomcat-9.0.12/logs/catalina.out` to logstash, But java exceptions is going to be multiline and hence we are goign to handle it wuth mutliline arguments in filebeat.
+
+### Beats Configuration
+
+```
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/messages
+  fields:
+    logtype: system
+- input_type: log
+  paths:
+    - /home/studentapp/apache-tomcat-9.0.12/logs/catalina.out 
+  fields:
+    logtype: tomcat
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  
+output.logstash:
+  hosts: ["elk:5044"]
+```
